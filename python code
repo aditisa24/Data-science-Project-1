@@ -1,0 +1,118 @@
+from csv import reader
+opened_file=open('googleplaystore.csv')
+read_file = reader(opened_file)
+android=list(read_file)
+android_header = android[0]
+android_data=android[1:]
+opened_file2 = open('AppleStore.csv')
+read_file2 = reader(opened_file2)
+ios = list(read_file2)
+ios_header = ios[0]
+ios_data=ios[1:]
+
+def explore_data(dataset, start, end, rows_and_columns=False):
+    dataset_slice = dataset[start:end]    
+    for row in dataset_slice:
+        print(row)
+        print('\n')
+        
+    if rows_and_columns:
+        print('Number of rows:', len(dataset))
+        print('Number of columns:', len(dataset[0]))
+
+print(android_header)
+print('\n')
+explore_data(android_data, 0, 3, True)
+
+l=len(android_header)
+for row in android_data:
+    length=len(row)
+    if(length!=l):
+        print(row)
+        print(android_data.index(row))
+        del (android_data[10472])
+
+
+print(len(android_data))
+
+duplicates=[]
+unique=[]
+for row in android_data:
+    name=row[0]
+    if name in unique:
+        duplicates.append(name)
+    else:
+        unique.append(name)
+print("Number of duplicates app in google dataset are:", len(duplicates))
+print("Number of unique apps in google dataset are:", len(unique)) 
+
+
+reviews_max = {}
+
+for app in android_data:
+    name = app[0]
+    n_reviews = float(app[3])
+    
+    if name in reviews_max and reviews_max[name] < n_reviews:
+        reviews_max[name] = n_reviews
+        
+    elif name not in reviews_max:
+        reviews_max[name] = n_reviews
+
+print('Expected length:', len(android_data) - 1181)
+print('Actual length:', len(reviews_max))
+
+
+android_clean = []
+already_added = []
+
+for app in android_data:
+    name = app[0]
+    n_reviews = float(app[3])
+    
+    if (reviews_max[name] == n_reviews) and (name not in already_added):
+        android_clean.append(app)
+        already_added.append(name)
+
+explore_data(android_clean, 0, 3, True)
+
+def check(str):
+    count=0;
+    for i in str:
+        if ord(i)>127:
+            count+=1
+    if count>3:
+            return False
+    else:
+            return True
+print(check('Instragram'))
+print(check('爱奇艺PPS -《欢乐颂2》电视剧热播'))
+        
+
+english_apps_android=[]
+for row in android_clean:
+    if check(row[0]):
+        english_apps_android.append(row)
+print(len(english_apps_android))
+
+english_apps_ios=[]
+for row in ios_data:
+    if check(row[1]):
+        english_apps_ios.append(row)
+print(len(english_apps_ios))
+
+explore_data(english_apps_android, 0, 3, True)
+print('\n')
+explore_data(english_apps_ios, 0, 3, True)
+
+android_final=[]
+for row in english_apps_android:
+    if row[7]=='0':
+        android_final.append(row)
+ios_final=[]
+for row in english_apps_ios:
+    if row[4]=='0.0':
+        ios_final.append(row)
+    
+print(len(android_final))
+print(len(ios_final))
